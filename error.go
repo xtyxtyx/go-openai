@@ -16,6 +16,12 @@ type APIError struct {
 	HTTPStatus     string      `json:"-"`
 	HTTPStatusCode int         `json:"-"`
 	InnerError     *InnerError `json:"innererror,omitempty"`
+	Metadata       *Metadata   `json:"metadata,omitempty"`
+}
+
+type Metadata struct {
+	Raw          string `json:"raw,omitempty"`
+	ProviderName string `json:"provider_name,omitempty"`
 }
 
 // InnerError Azure Content filtering. Only valid for Azure OpenAI Service.
@@ -38,7 +44,13 @@ type ErrorResponse struct {
 
 func (e *APIError) Error() string {
 	if e.HTTPStatusCode > 0 {
-		return fmt.Sprintf("error, status code: %d, status: %s, message: %s", e.HTTPStatusCode, e.HTTPStatus, e.Message)
+		errorMessage := fmt.Sprintf("error, status code: %d, status: %s, message: %s", e.HTTPStatusCode, e.HTTPStatus, e.Message)
+
+		if e.Metadata != nil {
+			errorMessage += fmt.Sprintf(", raw: %s", e.Metadata.Raw)
+		}
+
+		return errorMessage
 	}
 
 	return e.Message
