@@ -16,7 +16,7 @@ type APIError struct {
 	HTTPStatus     string      `json:"-"`
 	HTTPStatusCode int         `json:"-"`
 	InnerError     *InnerError `json:"innererror,omitempty"`
-	Metadata       *Metadata   `json:"metadata,omitempty"`
+	Raw            string      `json:"raw,omitempty"`
 }
 
 type Metadata struct {
@@ -46,8 +46,8 @@ func (e *APIError) Error() string {
 	if e.HTTPStatusCode > 0 {
 		errorMessage := fmt.Sprintf("error, status code: %d, status: %s, message: %s", e.HTTPStatusCode, e.HTTPStatus, e.Message)
 
-		if e.Metadata != nil {
-			errorMessage += fmt.Sprintf(", raw: %s", e.Metadata.Raw)
+		if e.Raw != "" {
+			errorMessage += fmt.Sprintf(", raw: %s", e.Raw)
 		}
 
 		return errorMessage
